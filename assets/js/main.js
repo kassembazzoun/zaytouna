@@ -98,6 +98,8 @@ function setLang(l) {
   renderChips();
   renderShelves();
   renderBasket();
+  renderStores();
+  if (current && pd.open) openProduct(current.id);
 }
 $("#langBtn").addEventListener("click", () => setLang(lang === "ar" ? "en" : "ar"));
 
@@ -172,7 +174,8 @@ function openProduct(id) {
   $("#pdCook").textContent = t(current, "c");
   $("#pdWith").textContent = t(current, "w");
   $("#qVal").textContent = qty;
-  pd.showModal();
+  renderWhere(current);
+  if (!pd.open) pd.showModal();
 }
 $("#qMinus").onclick = () => { qty = Math.max(1, qty - 1); $("#qVal").textContent = qty; };
 $("#qPlus").onclick = () => { qty = Math.min(20, qty + 1); $("#qVal").textContent = qty; };
@@ -218,5 +221,113 @@ $("#sendWa").onclick = () => {
     : ["Hi Zaytouna, I'd like to order:", ...ids.map(id => `- ${byId[id].en} x ${basket[id]}`), name && `Name: ${name}`, area && `Address: ${area}`];
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.filter(Boolean).join("\n"))}`, "_blank", "noopener");
 };
+
+/* ---------- where to buy ---------- */
+// Map areas: x/y are positions on the hand-drawn Lebanon map (viewBox 400 x 510).
+const AREAS = {
+  tripoli:  { ar: "طرابلس", en: "Tripoli", x: 200, y: 96 },
+  jbeil:    { ar: "جبيل", en: "Byblos", x: 158, y: 184 },
+  kesrouan: { ar: "كسروان", en: "Kesrouan", x: 154, y: 219 },
+  baalbek:  { ar: "بعلبك", en: "Baalbek", x: 279, y: 219 },
+  beirut:   { ar: "بيروت", en: "Beirut", x: 116, y: 251, side: -1 },
+  metn:     { ar: "المتن", en: "Metn", x: 160, y: 250 },
+  zahle:    { ar: "زحلة", en: "Zahle", x: 209, y: 262 },
+  chouf:    { ar: "الشوف", en: "Chouf", x: 135, y: 306 },
+  saida:    { ar: "صيدا", en: "Saida", x: 93, y: 347 },
+  nabatieh: { ar: "النبطية", en: "Nabatieh", x: 116, y: 399 },
+  tyre:     { ar: "صور", en: "Tyre", x: 54, y: 431 }
+};
+
+// Real stores first (Tyre district), then made-up example stores for other areas.
+// products = ids from PRODUCTS above. map = Google Maps link to the branch (empty = search by name).
+const ALL = ["kibbeh", "shishbarak", "samb-meat", "samb-cheese", "rolls", "shrimp", "saniyeh", "soufle", "akawi", "mozzarella"];
+const STORES = [
+  { ar: "سوبرماركت الجواد", en: "Supermarket Aljawad", area: "tyre", addrAr: "صور، الحناوية", addrEn: "Tyre, Hanaway", map: "", products: ALL },
+  { ar: "سمارت مارت", en: "Smartmart", area: "tyre", addrAr: "فرع صور", addrEn: "Tyre branch", map: "", products: ALL },
+  { ar: "سمارت مارت", en: "Smartmart", area: "tyre", addrAr: "فرع العباسية", addrEn: "Abbasieh branch", map: "", products: ALL },
+  { ar: "سمارت مارت", en: "Smartmart", area: "tyre", addrAr: "فرع الحوش", addrEn: "Hosh branch", map: "", products: ALL },
+  { ar: "سكسوك", en: "Saksouk", area: "tyre", addrAr: "صور، الحوش", addrEn: "Tyre, Hosh", map: "", products: ALL },
+  { ar: "فاميلي مارت", en: "Family Mart", area: "tyre", addrAr: "صور، الحناوية", addrEn: "Tyre, Hanaway", map: "", products: ALL },
+
+  // EXAMPLE STORES (made up): replace or delete when the real list for these areas is ready.
+  { ar: "سوبرماركت الضيعة", en: "Al Dayaa Market", area: "beirut", addrAr: "الأشرفية، شارع مار مخايل", addrEn: "Achrafieh, Mar Mikhael St.", map: "",
+    products: ["kibbeh", "samb-meat", "samb-cheese", "rolls", "saniyeh", "akawi"] },
+  { ar: "دكّانة الحمرا", en: "Hamra Dekkaneh", area: "beirut", addrAr: "الحمرا، شارع المقدسي", addrEn: "Hamra, Makdessi St.", map: "",
+    products: ["shishbarak", "samb-cheese", "rolls", "mozzarella"] },
+  { ar: "ميني ماركت أبو إيلي", en: "Abou Elie Mini Market", area: "metn", addrAr: "جل الديب، الأوتوستراد", addrEn: "Jal el Dib, Highway", map: "",
+    products: ["kibbeh", "shishbarak", "samb-meat", "soufle"] },
+  { ar: "سوق الجبل", en: "Souk el Jabal", area: "chouf", addrAr: "بعقلين، الساحة", addrEn: "Baakline, Main Square", map: "",
+    products: ["kibbeh", "saniyeh", "soufle", "mozzarella", "akawi"] },
+  { ar: "سوبرماركت البحر", en: "Al Bahr Supermarket", area: "saida", addrAr: "صيدا، الكورنيش البحري", addrEn: "Saida, Seaside Corniche", map: "",
+    products: ["shrimp", "rolls", "samb-cheese", "kibbeh"] },
+  { ar: "تعاونية الكرم", en: "Al Karm Co-op", area: "zahle", addrAr: "زحلة، البولفار", addrEn: "Zahle, Boulevard", map: "",
+    products: ["akawi", "mozzarella", "samb-cheese", "shishbarak", "saniyeh", "kibbeh", "rolls"] },
+  { ar: "ماركت الميناء", en: "Al Mina Market", area: "tripoli", addrAr: "طرابلس، الميناء", addrEn: "Tripoli, El Mina", map: "",
+    products: ["kibbeh", "samb-meat", "shrimp"] }
+];
+const storeKey = s => s.en + " | " + s.addrEn;
+
+let area = "all";
+const storesIn = a => STORES.filter(s => a === "all" || s.area === a);
+
+function renderStores() {
+  const counts = {};
+  STORES.forEach(s => { counts[s.area] = (counts[s.area] || 0) + 1; });
+
+  $("#pins").innerHTML = Object.entries(AREAS).map(([k, a]) => {
+    const n = counts[k] || 0;
+    const side = a.side || (a.x > 230 ? -1 : 1); // keep labels clear of each other
+    return `<g class="pin${area === k ? " on" : ""}${n ? "" : " empty"}" data-area="${k}" tabindex="0" role="button" aria-label="${esc(a[lang])}">
+      <circle class="ring" cx="${a.x}" cy="${a.y}" r="15"/>
+      <circle class="dot" cx="${a.x}" cy="${a.y}" r="${n ? 8 + Math.min(n, 6) : 5}"/>
+      ${n ? `<text class="count" x="${a.x}" y="${a.y + 3.5}" text-anchor="middle">${n}</text>` : ""}
+      <text x="${a.x + side * 14}" y="${a.y + 5}" text-anchor="${side > 0 ? "start" : "end"}">${esc(a[lang])}</text>
+    </g>`;
+  }).join("");
+
+  const used = Object.keys(AREAS).filter(k => counts[k]).sort((a, b) => counts[b] - counts[a]);
+  $("#areaChips").innerHTML = [["all", lang === "ar" ? "كلّ لبنان" : "All Lebanon"], ...used.map(k => [k, AREAS[k][lang]])]
+    .map(([k, label]) => `<button class="chip" type="button" data-area="${k}" aria-pressed="${area === k}">${esc(label)}</button>`).join("");
+
+  const list = storesIn(area);
+  $("#receipts").innerHTML = list.length ? list.map((s, i) => {
+    const mapUrl = s.map || `https://www.google.com/maps/search/${encodeURIComponent(s.en + " " + s.addrEn + " Lebanon")}`;
+    const tilt = [-1.5, 1.2, -0.6, 1.8, -1.1, 0.7][i % 6];
+    return `<article class="receipt" style="--tilt:${tilt}deg" data-store="${esc(storeKey(s))}">
+      <div class="top">
+        <img src="assets/brand/mark-ink.svg" alt="">
+        <div class="store">${esc(s[lang])}</div>
+        <div class="addr">${esc(lang === "ar" ? s.addrAr : s.addrEn)}</div>
+        <div class="when">${AREAS[s.area][lang]}</div>
+      </div>
+      <ul>${s.products.filter(id => byId[id]).map(id => `<li><img src="assets/img/${byId[id].img}.webp" alt=""><span>${esc(byId[id][lang])}</span><i>&#10003;</i></li>`).join("")}</ul>
+      <div class="total"><span>${lang === "ar" ? "أصناف زيتونة" : "Zaytouna items"}</span><span>${s.products.length}</span></div>
+      <div class="barcode"></div>
+      <div class="thanks">${lang === "ar" ? "صحتين، ومنشوفكن قريباً" : "Sahtein, see you soon"}</div>
+      <a class="go" href="${mapUrl}" target="_blank" rel="noopener">${lang === "ar" ? "افتح عالخريطة" : "Open in Maps"}</a>
+    </article>`;
+  }).join("") : `<p class="stores-empty">${lang === "ar" ? "لسّا ما وصلنا لهون، بس عم نقرّب! اطلب عالواتساب ومنوصّلك." : "Not in this area yet, but we're getting closer! Order on WhatsApp and we'll deliver."}</p>`;
+}
+function pickArea(k) { area = area === k && k !== "all" ? "all" : k; renderStores(); }
+$("#pins").addEventListener("click", e => { const g = e.target.closest(".pin"); if (g) pickArea(g.dataset.area); });
+$("#pins").addEventListener("keydown", e => { const g = e.target.closest(".pin"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pickArea(g.dataset.area); } });
+$("#areaChips").addEventListener("click", e => { const b = e.target.closest(".chip"); if (b) pickArea(b.dataset.area); });
+
+// "where to find it" inside the product card
+function renderWhere(p) {
+  const where = STORES.filter(s => s.products.includes(p.id));
+  $("#pdWhere").innerHTML = where.length
+    ? where.map(s => `<button class="where-link" type="button" data-store="${esc(storeKey(s))}" data-area="${s.area}">${esc(s[lang])}</button> <small>(${esc(lang === "ar" ? s.addrAr : s.addrEn)})</small>`).join("<br>")
+    : (lang === "ar" ? "اطلبها عالواتساب ومنوصّلك." : "Order it on WhatsApp and we'll deliver.");
+}
+$("#pdWhere").addEventListener("click", e => {
+  const b = e.target.closest(".where-link");
+  if (!b) return;
+  pd.close();
+  area = b.dataset.area; renderStores();
+  const r = [...document.querySelectorAll(".receipt")].find(el => el.dataset.store === b.dataset.store);
+  $("#stores").scrollIntoView({ behavior: "smooth" });
+  if (r) { r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash"); }
+});
 
 setLang(lang);

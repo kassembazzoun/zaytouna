@@ -9,7 +9,7 @@
 <link rel="icon" href="assets/brand/mark-ink.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Kalam:wght@400;700&family=Marcellus&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;1,400&family=Amiri:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&family=Aref+Ruqaa:wght@400;700&family=Kalam:wght@400;700&family=Marcellus&family=Noto+Naskh+Arabic:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -29,6 +29,7 @@
       <a href="#story"><span class="ar">حكايتنا</span><span class="en">Our story</span></a>
       <a href="#shop"><span class="ar">الدكّانة</span><span class="en">The shelf</span></a>
       <a href="#cook"><span class="ar">كيف بتطبخها</span><span class="en">How to cook</span></a>
+      <a href="#stores"><span class="ar">وين تلاقينا</span><span class="en">Stores</span></a>
       <a href="#order"><span class="ar">اطلب</span><span class="en">Order</span></a>
     </nav>
     <button class="lang" id="langBtn" type="button">English</button>
@@ -155,6 +156,35 @@
   </div>
 </section>
 
+<!-- WHERE TO BUY -->
+<section class="stores" id="stores">
+  <div class="wrap">
+    <div class="stores-head">
+      <div>
+        <div class="eyebrow"><span class="ar">وين بتلاقينا</span><span class="en">Where to find us</span></div>
+        <h2><span class="ar">زيتونة <span class="hand">بالسوبرماركت حدّك</span></span><span class="en">Zaytouna <span class="hand">at a market near you</span></span></h2>
+      </div>
+      <p><span class="ar">كبسة على منطقتك بالخريطة، وشوف فاتورة كلّ سوبرماركت: شو في من أصناف زيتونة عندو، ووين الفرع.</span><span class="en">Tap your area on the map and read each market's receipt: which Zaytouna products it carries, and where the branch is.</span></p>
+    </div>
+    <div class="stores-grid">
+      <div class="map-card">
+        <svg class="lb-map" id="lbMap" viewBox="10 10 380 495" role="group" aria-label="Lebanon">
+          <path class="sea-lines" d="M30 120c14-6 22 6 36 0M18 200c14-6 22 6 36 0M30 290c14-6 22 6 36 0" />
+          <text class="sea" x="22" y="345">البحر</text>
+          <path class="land" d="M246.5 33.5 Q267.4 32.1 290.7 29.1 Q314.0 26.2 327.9 35.0 Q341.9 43.7 354.7 55.4 Q367.4 67.0 372.1 81.6 Q376.7 96.2 365.1 113.7 Q353.5 131.1 341.9 157.4 Q330.2 183.6 316.3 208.4 Q302.3 233.1 279.1 255.0 Q255.8 276.9 247.7 294.3 Q239.5 311.8 230.2 330.8 Q220.9 349.7 215.1 365.7 Q209.3 381.8 200.0 397.8 Q190.7 413.8 176.7 418.2 Q162.8 422.6 148.8 426.9 Q134.9 431.3 127.9 453.2 Q120.9 475.0 107.0 482.3 Q93.0 489.6 75.6 488.1 Q58.1 486.7 40.7 485.2 Q23.3 483.8 29.1 472.1 Q34.9 460.5 39.5 445.9 Q44.2 431.3 51.2 412.4 Q58.1 393.4 67.4 378.9 Q76.7 364.3 81.4 355.5 Q86.0 346.8 91.9 332.2 Q97.7 317.7 101.2 304.5 Q104.7 291.4 107.0 275.4 Q109.3 259.4 109.3 253.5 Q109.3 247.7 116.3 246.3 Q123.3 244.8 130.2 237.5 Q137.2 230.2 140.7 225.9 Q144.2 221.5 146.5 205.5 Q148.8 189.4 151.2 167.6 Q153.5 145.7 160.5 135.5 Q167.4 125.3 174.4 110.7 Q181.4 96.2 186.0 90.3 Q190.7 84.5 197.7 75.8 Q204.7 67.0 215.1 51.0 Q225.6 35.0 246.5 33.5Z"/>
+          <g id="pins"></g>
+        </svg>
+        <div class="compass hand"><span class="ar">شمال</span><span class="en">North</span><svg viewBox="0 0 20 30"><path d="M10 28V4m0 0L4 11m6-7l6 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <img class="map-sprig" src="assets/brand/sprig-herb.svg" alt="">
+      </div>
+      <div>
+        <div class="chips" id="areaChips" role="group"></div>
+        <div class="receipts" id="receipts"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- NAFAS -->
 <section class="nafas">
   <div class="wrap">
@@ -185,7 +215,7 @@
       <dl>
         <div><dt><span class="ar">واتساب</span><span class="en">WhatsApp</span></dt><dd><span dir="ltr">+961 00 000 000</span></dd></div>
         <div><dt><span class="ar">التوصيل</span><span class="en">Delivery</span></dt><dd><span class="ar">بيروت، جبل لبنان، والمناطق، اسألنا عن منطقتك</span><span class="en">Beirut, Mount Lebanon and beyond. Ask us about your area</span></dd></div>
-        <div><dt><span class="ar">بالمحلّات</span><span class="en">In stores</span></dt><dd><span class="ar">قريباً بالسوبرماركت حدّك</span><span class="en">Coming soon to a supermarket near you</span></dd></div>
+        <div><dt><span class="ar">بالمحلّات</span><span class="en">In stores</span></dt><dd><a href="#stores"><span class="ar">شوف السوبرماركات على الخريطة</span><span class="en">See the markets on the map</span></a></dd></div>
       </dl>
     </div>
   </div>
@@ -236,6 +266,8 @@
       <p id="pdCook"></p>
       <h4><span class="ar">بتنحطّ حدّ</span><span class="en">Serve it with</span></h4>
       <p id="pdWith"></p>
+      <h4><span class="ar">وين بلاقيها؟</span><span class="en">Where to find it</span></h4>
+      <p id="pdWhere"></p>
       <div class="add">
         <div class="qty">
           <button type="button" id="qMinus" aria-label="-">&minus;</button>
