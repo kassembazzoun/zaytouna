@@ -123,8 +123,21 @@ function applyFilter() {
   });
 }
 
+// On phones each shelf is split into planks of two so nothing needs side-scrolling.
+const mobile = matchMedia("(max-width: 760px)");
+function shelfRows() {
+  if (!mobile.matches) return SHELVES;
+  const rows = [];
+  SHELVES.forEach(r => {
+    const ids = r.filter(id => id !== "__note");
+    for (let i = 0; i < ids.length; i += 2) rows.push(ids.slice(i, i + 2));
+  });
+  return rows;
+}
+mobile.addEventListener("change", () => renderShelves());
+
 function renderShelves() {
-  $("#shelves").innerHTML = SHELVES.map(row => `
+  $("#shelves").innerHTML = shelfRows().map(row => `
     <div class="shelf-scroll"><div class="shelf">
       ${row.map((id, i) => {
         if (id === "__note") return `<div class="shelf-note">

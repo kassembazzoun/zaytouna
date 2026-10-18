@@ -14,7 +14,7 @@
   --oil: #b9973f;          /* olive oil gold */
   --line: rgba(28, 26, 23, .14);
 
-  --cm: clamp(5px, .82vw, 10px);  /* 1 real centimetre on the shelf */
+  --cm: clamp(5px, .7vw, 8.6px);  /* 1 real centimetre on the shelf */
   --gutter: clamp(16px, 4vw, 48px);
   --max: 1220px;
 }
@@ -241,7 +241,7 @@ html[lang="en"] .card ul { font-size: 20px; }
 .item {
   position: relative; z-index: 1;
   width: calc(var(--w) * var(--cm)); flex: none;
-  margin-inline: calc(var(--cm) * -1.2);
+  margin-inline: calc(var(--cm) * 2.2);
   background: none; border: 0; padding: 0;
   transform: rotate(var(--r, 0deg)); transform-origin: 50% 100%;
   transition: transform .35s cubic-bezier(.2, .7, .3, 1.3), opacity .3s, filter .3s;
@@ -271,11 +271,14 @@ html[lang="en"] .card ul { font-size: 20px; }
   transform: rotate(-4deg); text-align: center;
 }
 .shelf-note img { width: 34%; margin: 0 auto 8px; transform: rotate(-20deg); }
-.swipe { display: none; margin: -30px 0 20px; color: var(--sumac); font-size: 19px; }
+.swipe { display: none; }
 @media (max-width: 760px) {
-  .swipe { display: block; }
-  :root { --cm: 5.2px; }
-  .shelf { justify-content: flex-start; }
+  /* mobile: two packs per plank, scaled so the widest pair fits the screen */
+  :root { --cm: min(5.4px, calc((100vw - 32px) / 72)); }
+  .shelf-scroll { overflow: visible; }
+  .shelf { min-width: 0; padding: 0 calc(var(--cm) * 2); margin-bottom: calc(var(--cm) * 13); }
+  .item { margin-inline: calc(var(--cm) * 2.5); }
+  .tag { font-size: 14px; padding-inline: 14px; }
 }
 
 /* ---------- how to cook (dark, like the boxes) ---------- */
